@@ -1,0 +1,26 @@
+{
+    "compress": [
+        {
+            "file_type": "image",
+            "file_format": "WEBP",
+            "compress_name": "image_lanczos_webp",
+            "width": 0,
+            "resampling": "LANCZOS"
+        },
+        {
+            "file_type": "image",
+            "file_format": "WEBP",
+            "compress_name": "image_327_lanczos_webp",
+            "width": 327,
+            "resampling": "LANCZOS"
+        },
+        {
+            "file_type": "image",
+            "file_format": "WEBP",
+            "compress_name": "image_1000_lanczos_webp",
+            "width": 1000,
+            "resampling": "LANCZOS"
+        }
+    ],
+    "moderation": []
+}

@@ -1,0 +1,72 @@
+[project]
+name = "file-box"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "alembic>=1.15.1",
+    "datapipe-app>=0.5.4",
+    "datapipe-core>=0.14.2",
+    "datapipe-image-moderation",
+    "datapipe-label-studio-lite>=0.3.5",
+    "fastapi>=0.115.11",
+    "fsspec>=2025.3.0",
+    "loguru>=0.7.3",
+    "pillow>=10.4.0",
+    "psycopg2-binary>=2.9.10",
+    "pydantic==2.9.2",
+    "pydantic-settings>=2.8.1",
+    "setuptools>=77.0.1",
+    "sqlalchemy>=2.0.39",
+    "uvicorn>=0.34.0",
+]
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "ruff>=0.11.0",
+]
+
+[tool.ruff]
+
+exclude = ["version", "Makefile", "README.md", ".vscode"]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "C",
+    "Q",
+    ]
+ignore = ["B904", "B008", "E902", "F401"]
+
+[tool.mypy]
+
+ignore_missing_imports = true
+follow_imports = "silent"
+namespace_packages = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+pretty = true
+explicit_package_bases = true
+
+
+[tool.uv.sources]
+datapipe-image-moderation = { git = "https://github.com/epoch8/datapipe-image-moderation.git", rev = "v2025.03.25-dev.0.2.0" }
+
+[tool.hatch.build.targets.sdist]
+include = ["file_box"]
+
+[tool.hatch.build.targets.wheel]
+include = ["file_box"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
