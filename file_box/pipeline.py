@@ -87,7 +87,7 @@ def get_pipeline_steps() -> list:
 ds = DataStore(
     meta_dbconn=DBConn(
         connstr=db_config.dsn,
-        schema=pipeline_config.meta_schema,
+        schema=pipeline_config.datapipe_meta_schema,
     )
 )
 datapipe_app = DatapipeApp(ds=ds, catalog=catalog.get_file_catalog(), pipeline=Pipeline(get_pipeline_steps()))
