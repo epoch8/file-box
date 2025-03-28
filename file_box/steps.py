@@ -35,15 +35,14 @@ def file_box_generate_image_moderation_config(config_path: str) -> Generator[pd.
     yield pd.DataFrame(compress_data, columns=["file_type", "ls_data"])
 
 
-def file_box_file_raw_save_to_store(
-    file_raw_df: pd.DataFrame,
+def file_box_file_data_generate_path(
+    file_data_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    res_df = file_raw_df[["file_id", "file_type"]]
+    res_df = file_data_df[["file_id", "file_type", "meta_data"]]
     res_df["path"] = res_df.apply(
         lambda x: FILENAME_PATTERN_RAW.format(
             file_type=x["file_type"], file_id=x["file_id"]), axis=1
         )
-    res_df["meta_data"] = [{}] * len(res_df)
     return res_df
 
 

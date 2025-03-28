@@ -29,8 +29,8 @@ def get_pipeline_steps() -> list:
             delete_stale=True,
         ),
         BatchTransform(
-            steps.file_box_file_raw_save_to_store,
-            inputs=["file_box_file_raw"],
+            steps.file_box_file_data_generate_path,
+            inputs=[tables.FileData],
             outputs=[tables.FileData],
             chunk_size=10
         ),

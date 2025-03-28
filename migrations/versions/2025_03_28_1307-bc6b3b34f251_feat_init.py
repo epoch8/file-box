@@ -1,8 +1,8 @@
 """feat: init
 
-Revision ID: ae10ccc53339
+Revision ID: bc6b3b34f251
 Revises: 
-Create Date: 2025-03-27 14:02:48.633873
+Create Date: 2025-03-28 13:07:47.881796
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ae10ccc53339'
+revision: str = 'bc6b3b34f251'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.Column('file_id', sa.String(), nullable=False),
     sa.Column('file_type', sa.String(), nullable=False),
     sa.Column('meta_data', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('path', sa.String(), nullable=False),
+    sa.Column('path', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('file_id', 'file_type')
     )
     op.create_table('file_box_file_deleted_data',
@@ -102,6 +102,16 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('file_id', 'file_type', 'compress_name'),
     schema='public'
     )
+    op.create_table('file_box_file_data_generate_path_cc7125fe3e_meta',
+    sa.Column('file_id', sa.String(), nullable=False),
+    sa.Column('file_type', sa.String(), nullable=False),
+    sa.Column('process_ts', sa.Float(), nullable=True),
+    sa.Column('is_success', sa.Boolean(), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('error', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('file_id', 'file_type'),
+    schema='public'
+    )
     op.create_table('file_box_file_data_meta',
     sa.Column('file_id', sa.String(), nullable=False),
     sa.Column('file_type', sa.String(), nullable=False),
@@ -122,16 +132,6 @@ def upgrade() -> None:
     sa.Column('process_ts', sa.Float(), nullable=True),
     sa.Column('delete_ts', sa.Float(), nullable=True),
     sa.PrimaryKeyConstraint('file_type', 'file_id'),
-    schema='public'
-    )
-    op.create_table('file_box_file_raw_save_to_store_06884df8e1_meta',
-    sa.Column('file_id', sa.String(), nullable=False),
-    sa.Column('file_type', sa.String(), nullable=False),
-    sa.Column('process_ts', sa.Float(), nullable=True),
-    sa.Column('is_success', sa.Boolean(), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.Column('error', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('file_id', 'file_type'),
     schema='public'
     )
     op.create_table('file_box_image_compress_86ef209c89_meta',
@@ -249,9 +249,9 @@ def downgrade() -> None:
     op.drop_table('file_box_image_compressed_meta', schema='public')
     op.drop_table('file_box_image_compress_config_meta', schema='public')
     op.drop_table('file_box_image_compress_86ef209c89_meta', schema='public')
-    op.drop_table('file_box_file_raw_save_to_store_06884df8e1_meta', schema='public')
     op.drop_table('file_box_file_raw_meta', schema='public')
     op.drop_table('file_box_file_data_meta', schema='public')
+    op.drop_table('file_box_file_data_generate_path_cc7125fe3e_meta', schema='public')
     op.drop_table('file_box_compress_data_meta', schema='public')
     op.drop_table('image_to_moderate_ls_input')
     op.drop_table('file_box_image_moderation_manual')

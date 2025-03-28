@@ -80,7 +80,7 @@ class FileData(Base):
     file_id: Mapped[str] = mapped_column(primary_key=True)
     file_type: Mapped[str] = mapped_column(primary_key=True)
     meta_data: Mapped[dict] = mapped_column(JSONB)
-    path: Mapped[str]
+    path: Mapped[str | None]
     
 
 class CompressData(Base):
