@@ -52,7 +52,7 @@ class ResponseDTO:
     file_id: str
     source_path: str
     compress_info: list[CompressInfoDTO] | None = None
-    metadata: dict[str, Any] = field(default_factory=dict)
+    meta_data: dict[str, Any] = field(default_factory=dict)
 
 
 def generate_response(data: list[tuple[tables.FileData, tables.CompressData]]) -> ResponseDTO:
@@ -69,7 +69,7 @@ def generate_response(data: list[tuple[tables.FileData, tables.CompressData]]) -
         file_id=file_data.file_id,
         source_path=path,
         compress_info=compress_data,
-        metadata=file_data.meta_data,
+        meta_data=file_data.meta_data,
     )
 
 
@@ -94,7 +94,7 @@ def save_file_meta_data(item: ItemDTO) -> None:
         .where(tables.FileData.file_id == item.file_id)
         .values(meta_data=item.meta_data)
         )
-    with get_sessionmaker()() as session:
+    with get_sessionmaker().begin() as session:
         session.execute(stmt)
 
 class FileBoxServiceProtocol(Protocol):
@@ -175,8 +175,8 @@ def get_file_box_service() -> FileBoxServiceProtocol:
 
 def main() -> None:
     file_box_service = FileBoxService(datapipe_app, pipeline_config)
-    file = open("tests/test.jpeg", "rb").read()
-    tmp = ItemDTO(file_bytes=file, file_type="image")
+    file = open("local/test.jpeg", "rb").read()
+    tmp = ItemDTO(file_bytes=file, file_type="image", meta_data={"test": "test"})
     res = file_box_service.upload_file(tmp)
     # config = open("file_box/configs/file_config.json", "r", encoding="utf-8").read()
     # file_box_service.set_config(FileConfigModel(**json.loads(config)))
