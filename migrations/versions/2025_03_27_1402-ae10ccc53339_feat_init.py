@@ -1,8 +1,8 @@
-"""init
+"""feat: init
 
-Revision ID: ed498479cd8c
+Revision ID: ae10ccc53339
 Revises: 
-Create Date: 2025-03-26 16:54:45.499922
+Create Date: 2025-03-27 14:02:48.633873
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ed498479cd8c'
+revision: str = 'ae10ccc53339'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -124,6 +124,28 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('file_type', 'file_id'),
     schema='public'
     )
+    op.create_table('file_box_file_raw_save_to_store_06884df8e1_meta',
+    sa.Column('file_id', sa.String(), nullable=False),
+    sa.Column('file_type', sa.String(), nullable=False),
+    sa.Column('process_ts', sa.Float(), nullable=True),
+    sa.Column('is_success', sa.Boolean(), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('error', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('file_id', 'file_type'),
+    schema='public'
+    )
+    op.create_table('file_box_image_compress_86ef209c89_meta',
+    sa.Column('file_id', sa.String(), nullable=False),
+    sa.Column('file_type', sa.String(), nullable=False),
+    sa.Column('file_format', sa.String(), nullable=False),
+    sa.Column('compress_name', sa.String(), nullable=False),
+    sa.Column('process_ts', sa.Float(), nullable=True),
+    sa.Column('is_success', sa.Boolean(), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('error', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('file_id', 'file_type', 'file_format', 'compress_name'),
+    schema='public'
+    )
     op.create_table('file_box_image_compress_config_meta',
     sa.Column('file_type', sa.String(), nullable=False),
     sa.Column('file_format', sa.String(), nullable=False),
@@ -160,6 +182,16 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('file_id', 'file_type'),
     schema='public'
     )
+    op.create_table('file_box_image_filter_for_moderation_378dab78c5_meta',
+    sa.Column('file_id', sa.String(), nullable=False),
+    sa.Column('file_type', sa.String(), nullable=False),
+    sa.Column('process_ts', sa.Float(), nullable=True),
+    sa.Column('is_success', sa.Boolean(), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('error', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('file_id', 'file_type'),
+    schema='public'
+    )
     op.create_table('file_box_image_filtered_for_moderation_meta',
     sa.Column('file_id', sa.String(), nullable=False),
     sa.Column('file_type', sa.String(), nullable=False),
@@ -168,6 +200,16 @@ def upgrade() -> None:
     sa.Column('update_ts', sa.Float(), nullable=True),
     sa.Column('process_ts', sa.Float(), nullable=True),
     sa.Column('delete_ts', sa.Float(), nullable=True),
+    sa.PrimaryKeyConstraint('file_id', 'file_type'),
+    schema='public'
+    )
+    op.create_table('file_box_image_google_moderation_1d4a6388fd_meta',
+    sa.Column('file_id', sa.String(), nullable=False),
+    sa.Column('file_type', sa.String(), nullable=False),
+    sa.Column('process_ts', sa.Float(), nullable=True),
+    sa.Column('is_success', sa.Boolean(), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.Column('error', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('file_id', 'file_type'),
     schema='public'
     )
@@ -192,64 +234,22 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('file_type'),
     schema='public'
     )
-    op.create_table('file_raw_save_to_store_75bf3853d3_meta',
-    sa.Column('file_id', sa.String(), nullable=False),
-    sa.Column('file_type', sa.String(), nullable=False),
-    sa.Column('process_ts', sa.Float(), nullable=True),
-    sa.Column('is_success', sa.Boolean(), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.Column('error', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('file_id', 'file_type'),
-    schema='public'
-    )
-    op.create_table('image_compress_b594ec81d8_meta',
-    sa.Column('file_id', sa.String(), nullable=False),
-    sa.Column('file_type', sa.String(), nullable=False),
-    sa.Column('file_format', sa.String(), nullable=False),
-    sa.Column('compress_name', sa.String(), nullable=False),
-    sa.Column('process_ts', sa.Float(), nullable=True),
-    sa.Column('is_success', sa.Boolean(), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.Column('error', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('file_id', 'file_type', 'file_format', 'compress_name'),
-    schema='public'
-    )
-    op.create_table('image_filter_for_moderation_06752517c9_meta',
-    sa.Column('file_id', sa.String(), nullable=False),
-    sa.Column('file_type', sa.String(), nullable=False),
-    sa.Column('process_ts', sa.Float(), nullable=True),
-    sa.Column('is_success', sa.Boolean(), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.Column('error', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('file_id', 'file_type'),
-    schema='public'
-    )
-    op.create_table('image_google_moderation_1762c0bc15_meta',
-    sa.Column('file_id', sa.String(), nullable=False),
-    sa.Column('file_type', sa.String(), nullable=False),
-    sa.Column('process_ts', sa.Float(), nullable=True),
-    sa.Column('is_success', sa.Boolean(), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.Column('error', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('file_id', 'file_type'),
-    schema='public'
-    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('image_google_moderation_1762c0bc15_meta', schema='public')
-    op.drop_table('image_filter_for_moderation_06752517c9_meta', schema='public')
-    op.drop_table('image_compress_b594ec81d8_meta', schema='public')
-    op.drop_table('file_raw_save_to_store_75bf3853d3_meta', schema='public')
     op.drop_table('file_box_image_moderation_config_meta', schema='public')
     op.drop_table('file_box_image_google_moderation_data_meta', schema='public')
+    op.drop_table('file_box_image_google_moderation_1d4a6388fd_meta', schema='public')
     op.drop_table('file_box_image_filtered_for_moderation_meta', schema='public')
+    op.drop_table('file_box_image_filter_for_moderation_378dab78c5_meta', schema='public')
     op.drop_table('file_box_image_exclude_moderation_meta', schema='public')
     op.drop_table('file_box_image_compressed_meta', schema='public')
     op.drop_table('file_box_image_compress_config_meta', schema='public')
+    op.drop_table('file_box_image_compress_86ef209c89_meta', schema='public')
+    op.drop_table('file_box_file_raw_save_to_store_06884df8e1_meta', schema='public')
     op.drop_table('file_box_file_raw_meta', schema='public')
     op.drop_table('file_box_file_data_meta', schema='public')
     op.drop_table('file_box_compress_data_meta', schema='public')

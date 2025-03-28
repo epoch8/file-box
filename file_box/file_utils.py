@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import fsspec
 import pandas as pd
+from loguru import logger
 from PIL import Image
 
 
@@ -28,7 +29,6 @@ def read_full_config_from_json(config_path: str) -> dict:
 
 def is_config_exists(config_path: str) -> bool:
     return os.path.isfile(config_path)
-
 
 
 class CraftReviewStatus(StrEnum):
@@ -62,16 +62,11 @@ def get_gs_path_from_image_url(image_url: str) -> str:
         bucket_name = parsed_url.path.split("/")[1]
         blob_name = "/".join(parsed_url.path.split("/")[2:])
         return f"gs://{bucket_name}/{blob_name}"
-
     return image_url
 
 
-
 def get_signed_url(
-    url: str,
-    file_system_name: str,
-    file_system_creds_path: Optional[str] = None,
-    days_expiration: int = 365
+    url: str, file_system_name: str, file_system_creds_path: str | None = None, days_expiration: int = 365
 ) -> str:
     if file_system_creds_path is not None:
         file_system = fsspec.filesystem(file_system_name, token=file_system_creds_path)
@@ -81,13 +76,14 @@ def get_signed_url(
     image_fs_path = get_gs_path_from_image_url(image_url=url)
     
     try:
-        expiration = datetime.datetime.now() + datetime.timedelta(days=days_expiration)
-        signed_url = file_system.sign(image_fs_path, expiration=expiration)
+        expiration = int(datetime.timedelta(days=days_expiration).total_seconds())
+        signed_url = file_system.sign(image_fs_path, expiration=expiration, )
         return signed_url
-    except (Exception,) as _:
+    except Exception as e:
+        logger.error(f"Failed to get signed url for {image_fs_path}: {e}")
         return ""
-    
-    
+
+
 def merge_metadata(row: pd.Series) -> dict:
     """
     Метод для подстановки default значений в metadata изображения пользователя (нужно, чтоб не сломать LabelStudio).
@@ -150,15 +146,15 @@ def save_image_to_io_bytes(img: Image.Image, image_format: str) -> bytes:
     with io.BytesIO() as output:
         img.save(output, format=image_format)
         return output.getvalue()
-    
-    
+
+
 class ResamplingMapEnum(StrEnum):
     LANCZOS = "LANCZOS"
     BILINEAR = "BILINEAR"
     BICUBIC = "BICUBIC"
     NEAREST = "NEAREST"
-    
-    
+
+
 RESAMPLING_MAP = {
     ResamplingMapEnum.LANCZOS: Image.Resampling.LANCZOS,
     ResamplingMapEnum.BILINEAR: Image.Resampling.BILINEAR,
@@ -195,4 +191,3 @@ def get_modified_image(img: Image.Image, resampling: ResamplingMapEnum, image_fo
     modified_img_bytes = save_image_to_io_bytes(img=modified_img, image_format=image_format)
 
     return modified_img_bytes
-    
