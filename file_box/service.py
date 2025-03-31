@@ -40,7 +40,6 @@ class ItemDTO:
 
 @dataclass
 class CompressInfoDTO:
-    compress_name: str
     path: str
 
     @classmethod
@@ -48,24 +47,25 @@ class CompressInfoDTO:
         path = get_signed_url_30_days(compress_data.path)
         if not path:
             path = compress_data.path
-        return cls(compress_data.compress_name, path)
+        return cls(compress_data.compress_name)
 
 
 @dataclass
 class ResponseDTO:
     file_id: str
     source_path: str
-    compress_info: list[CompressInfoDTO] | None = None
+    compress_info: dict[str, CompressInfoDTO] | None = None
     meta_data: dict[str, Any] = field(default_factory=dict)
 
 
 def generate_response(data: list[tuple[tables.FileData, tables.CompressData]]) -> ResponseDTO:
-    compress_data = []
+    compress_data = {}
     for _, compress_item in data:
         if compress_item is None:
             continue
-        compress_data.append(CompressInfoDTO.from_table(compress_item))
+        compress_data[compress_item.compress_name] = CompressInfoDTO.from_table(compress_item)
     file_data = data[0][0]
+    assert file_data.path is not None
     path = get_signed_url_30_days(file_data.path)
     if not path:
         path = file_data.path
@@ -85,7 +85,6 @@ def get_file_by_id(file_id: str) -> ResponseDTO | None:
     )
     with get_sessionmaker()() as session:
         stmt_res = session.execute(stmt).tuples().all()
-    logger.info(stmt_res)
     if not stmt_res:
         return None
     res = generate_response(list(stmt_res))
@@ -142,6 +141,10 @@ class FileBoxService(FileBoxServiceProtocol):
 
     def upload_file(self, item: ItemDTO) -> ResponseDTO:
         logger.info(f"Uploading file {item.file_id}")
+        if self.pipeline_config.file_config_json_path is None:
+            logger.warning("Config file not found, Please set config via set_config method")
+            raise ValueError("Config file not found, Please set config via set_config method")
+        
         if not is_config_exists(self.pipeline_config.file_config_json_path):
             logger.warning("Config file not found, Please set config via set_config method")
             raise ValueError("Config file not found, Please set config via set_config method")
@@ -170,12 +173,20 @@ class FileBoxService(FileBoxServiceProtocol):
 
     def get_config(self) -> FileConfigModel:
         logger.info("Getting config")
+        if self.pipeline_config.file_config_json_path is None:
+            logger.warning("Config file not found, Please set config via set_config method")
+            raise ValueError("Config file not found, Please set config via set_config method")
+        
         config = read_full_config_from_json(config_path=self.pipeline_config.file_config_json_path)
         logger.info("Config loaded")
         return FileConfigModel(**config)
 
     def set_config(self, config: FileConfigModel) -> None:
         logger.info("Setting config")
+        if self.pipeline_config.file_config_json_path is None:
+            logger.warning("Config file not found, Please set config via set_config method")
+            raise ValueError("Config file not found, Please set config via set_config method")
+        
         with open(self.pipeline_config.file_config_json_path, "w", encoding="utf-8") as config_file:
             json.dump(config.model_dump(mode="json"), config_file, indent=4)
         run_steps(self.app.ds, self.app.steps)
