@@ -3,14 +3,14 @@ name = "file-box"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.9,<3.12"
 dependencies = [
     "alembic>=1.15.1",
     "datapipe-app>=0.5.4",
     "datapipe-core>=0.14.2",
+    "datapipe-image-moderation",
     "datapipe-label-studio-lite>=0.3.5",
     "fastapi>=0.115.11",
-    "fsspec>=2025.3.0",
     "loguru>=0.7.3",
     "pillow>=10.4.0",
     "psycopg2-binary==2.9.9",
@@ -19,8 +19,6 @@ dependencies = [
     "setuptools>=77.0.1",
     "sqlalchemy>=2.0.39",
     "uvicorn>=0.34.0",
-    "google-cloud-storage==3.1.0",
-    "datapipe-image-moderation",
 ]
 [dependency-groups]
 dev = [
@@ -60,7 +58,7 @@ explicit_package_bases = true
 
 
 [tool.uv.sources]
-datapipe-image-moderation = { git = "https://github.com/epoch8/datapipe-image-moderation.git", rev = "v2025.03.28-dev.0.3.0" }
+datapipe-image-moderation = { git = "https://github.com/epoch8/datapipe-image-moderation.git", rev = "v2025.04.02-dev.0.4.0" }
 
 [tool.hatch.build.targets.sdist]
 include = ["file_box"]
