@@ -74,10 +74,13 @@ def get_signed_url(
         file_system = fsspec.filesystem(file_system_name)
 
     image_fs_path = get_gs_path_from_image_url(image_url=url)
-    
+
     try:
-        expiration = int(datetime.timedelta(days=days_expiration).total_seconds())
-        signed_url = file_system.sign(image_fs_path, expiration=expiration, )
+        expiration = datetime.datetime.now() + datetime.timedelta(days=30)
+        signed_url = file_system.sign(
+            image_fs_path,
+            expiration=expiration,
+        )
         return signed_url
     except Exception as e:
         logger.error(f"Failed to get signed url for {image_fs_path}: {e}")
