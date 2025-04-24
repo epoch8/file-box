@@ -155,7 +155,6 @@ class FileBoxService(FileBoxServiceProtocol):
         changes_from_db = self._save_file_to_store_table(item, "file_box_file_data")
         changes = {**changes_from_raw, **changes_from_db}
         change_list = ChangeList(changes)
-        change_list = ChangeList(changes_from_raw)
         run_steps_changelist(self.app.ds, self.app.steps, change_list)
         res = get_file_by_id(item.file_id)
         assert res is not None, f"File not found by id {item.file_id}"
