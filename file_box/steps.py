@@ -7,7 +7,7 @@ from datapipe.datatable import DataStore
 from datapipe.types import IndexDF
 from loguru import logger
 
-from file_box.catalog import FILENAME_PATTERN_RAW, IMAGE_PATTERN_COMPRESSED
+from file_box.catalog import IMAGE_PATTERN_COMPRESSED
 from file_box.file_utils import (
     ResamplingMapEnum,
     get_image_bytes,
@@ -33,17 +33,6 @@ def file_box_generate_image_moderation_config(config_path: str) -> Generator[pd.
     compress_data = read_config_from_json(config_path=config_path, config_name="moderation")
 
     yield pd.DataFrame(compress_data, columns=["file_type", "ls_data"])
-
-
-def file_box_file_data_generate_path(
-    file_data_df: pd.DataFrame,
-) -> pd.DataFrame:
-    res_df = file_data_df[["file_id", "file_type", "meta_data"]]
-    res_df["path"] = res_df.apply(
-        lambda x: FILENAME_PATTERN_RAW.format(
-            file_type=x["file_type"], file_id=x["file_id"]), axis=1
-        )
-    return res_df
 
 
 def file_box_image_compress(

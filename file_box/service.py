@@ -31,10 +31,12 @@ class ItemDTO:
     file_bytes: bytes
     meta_data: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self, exclude: set | None = None) -> dict[str, Any]:
+    def to_dict(self, exclude: set | None = None, generate_path: bool = True) -> dict[str, Any]:
         if exclude is None:
             exclude = set()
         res = {key: value for key, value in asdict(self).items() if key not in exclude}
+        if generate_path is True:
+            res["path"] = FILENAME_PATTERN_RAW.format(file_type=self.file_type, file_id=self.file_id)
         return res
 
 
@@ -127,17 +129,15 @@ class FileBoxService(FileBoxServiceProtocol):
         table = self.app.ds.get_table(table_name)
         if not isinstance(table.table_store, TableStoreFiledir):
             raise ValueError("Table store is not Filedir")
-        data_dict = item.to_dict()
+        data_dict = item.to_dict(generate_path=False)
         changes = table.store_chunk(pd.DataFrame([data_dict]))
         return {table_name: changes}
     
-    def _save_file_to_store_table(self, item: ItemDTO, table_name: str) -> dict[str, Any]:
-        table = self.app.ds.get_table(table_name)
-        if not isinstance(table.table_store, TableStoreDB):
-            raise ValueError("Table store is not DB")
-        data_dict = item.to_dict(exclude={"file_bytes"})
-        changes = table.store_chunk(pd.DataFrame([data_dict]))
-        return {table_name: changes}
+    def _save_file_to_store_table(self, item: ItemDTO) -> None:
+        data_dict = item.to_dict(exclude={"file_bytes"}, generate_path=True)
+        stmt = sa.insert(tables.FileData).values(data_dict)
+        with get_sessionmaker().begin() as session:
+            session.execute(stmt)
 
     def upload_file(self, item: ItemDTO) -> ResponseDTO:
         logger.info(f"Uploading file {item.file_id}")
@@ -150,9 +150,8 @@ class FileBoxService(FileBoxServiceProtocol):
             raise ValueError("Config file not found, Please set config via set_config method")
         
         changes_from_raw = self._save_data_to_filedir(item, "file_box_file_raw")
-        changes_from_db = self._save_file_to_store_table(item, "file_box_file_data")
-        changes = {**changes_from_raw, **changes_from_db}
-        change_list = ChangeList(changes)
+        self._save_file_to_store_table(item)
+        change_list = ChangeList(changes_from_raw)
         run_steps_changelist(self.app.ds, self.app.steps, change_list)
         res = get_file_by_id(item.file_id)
         assert res is not None, f"File not found by id {item.file_id}"

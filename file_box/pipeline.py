@@ -29,9 +29,6 @@ def get_pipeline_steps() -> list:
             delete_stale=True,
         ),
         BatchTransform(
-            steps.file_box_file_data_generate_path, inputs=[tables.FileData], outputs=[tables.FileData], chunk_size=10
-        ),
-        BatchTransform(
             steps.file_box_image_compress,
             inputs=[tables.ImageCompressConfig, "file_box_file_raw"],
             outputs=["file_box_image_compressed", tables.CompressData],

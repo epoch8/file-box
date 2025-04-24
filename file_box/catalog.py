@@ -2,6 +2,7 @@ from datapipe.compute import Catalog, Table
 from datapipe.store.filedir import BytesFile, TableStoreFiledir
 
 from file_box.settings import pipeline_config
+from file_box.tables import FileData
 
 FILENAME_PATTERN_RAW = f"{pipeline_config.document_blob_base_url}/files/{{file_type}}/{{file_id}}/raw.bytes"
 
@@ -29,11 +30,11 @@ def get_file_catalog_dict() -> dict[str, Table]:
                 enable_rm=True,
                 read_data=False,
             )
-        ),
+        )
     }
 
 def get_file_catalog() -> Catalog:
     catalog = Catalog(
-        get_file_catalog_dict()
+        get_file_catalog_dict(),
     )
     return catalog
