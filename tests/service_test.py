@@ -1,3 +1,4 @@
+from loguru import logger
 from file_box.service import FileBoxServiceProtocol, ItemDTO, get_file_by_id
 
 
